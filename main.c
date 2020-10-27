@@ -26,10 +26,10 @@ void print_to_file(uint64_t exp_bits, uint64_t mod_bits, double time_ms)
 
   if (base_time == 0) {
     base_time = time_ms;
-    fprintf(out_file, "base_time_ms == %f\n", base_time);
+    fprintf(out_file, "    base_time_ms = %f\n", base_time);
   }
 
-  fprintf(out_file, "if (exp, mod) == (%ld,%ld) : res = %f * base_time_ms\n", exp_bits, mod_bits, time_ms/base_time);
+  fprintf(out_file, "    if (exp, mod) == (%ld,%ld) : res = %f * base_time_ms\n", exp_bits, mod_bits, time_ms/base_time);
 }
 
 void set_file_letter(char l)
@@ -419,6 +419,7 @@ int main()
   set_file_letter('E');
 
   scalar_t exp = BN_new();
+  BN_rand(Q, 512, 1, 0);
 
   BN_rand(exp, 2*safe_prime_bits, 1, 0);  
   time_mod_exp(1000, N2, exp);
@@ -443,7 +444,6 @@ int main()
   time_mod_exp(1000, P, exp);
 
   BN_rand(exp, safe_prime_bits/8, 1, 0);
-  BN_rand(Q, 512, 1, 0);
   time_mod_exp(1000, N2, exp);
   time_mod_exp(1000, N, exp);
   time_mod_exp(1000, P, exp);
@@ -453,6 +453,14 @@ int main()
   time_mod_exp(1000, N2, exp);
   time_mod_exp(1000, N, exp);
   time_mod_exp(1000, P, exp);
+  time_mod_exp(1000, Q, exp);
+
+  BN_rand(exp, 896, 1, 0);
+  time_mod_exp(1000, Q, exp);
+  
+  BN_rand(exp, 384, 1, 0);
+  time_mod_exp(1000, Q, exp);
+  
 
   BN_rand(exp, 3*safe_prime_bits/4, 1, 0);
   time_mod_exp(1000, N2, exp);

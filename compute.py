@@ -13,46 +13,49 @@ ver = 0
 crt = 0
 
 def show_params():
-    print(f'pool = {pool}, ver = {ver}, crt = {crt}')
+    print(f'r^N pool sampling = {pool}, batch verification = {ver}, crt exponentiation = {crt}')
 
 def E(exp, mod, C=0, P=0, V=0):
     
     if P > 0: return 0
     
-    if V > 0: return E(exp,mod,C,P,V=0)/10
+    if V > 0: return  E(exp,mod,C,P,V=0)/10
     
     if C:
         exp //= 2
         mod //= 2
     
     res = 0
-    base_time_ms = 5.685242
+    base_time_ms = 7.929542
     if (exp, mod) == (2048,4096) : res = 1.000000 * base_time_ms
-    if (exp, mod) == (2048,1024) : res = 0.077083 * base_time_ms
-    if (exp, mod) == (1024,2048) : res = 0.136546 * base_time_ms
-    if (exp, mod) == (1024,4096) : res = 0.514042 * base_time_ms
-    if (exp, mod) == (1024,1024) : res = 0.039685 * base_time_ms
-    if (exp, mod) == (4096,4096) : res = 1.980670 * base_time_ms
-    if (exp, mod) == (512,4096) : res = 0.255801 * base_time_ms
-    if (exp, mod) == (512,2048) : res = 0.076914 * base_time_ms
-    if (exp, mod) == (512,1024) : res = 0.021245 * base_time_ms
-    if (exp, mod) == (256,4096) : res = 0.140735 * base_time_ms
-    if (exp, mod) == (256,2048) : res = 0.037493 * base_time_ms
-    if (exp, mod) == (256,1024) : res = 0.011757 * base_time_ms
-    if (exp, mod) == (128,4096) : res = 0.069756 * base_time_ms
-    if (exp, mod) == (128,2048) : res = 0.019113 * base_time_ms
-    if (exp, mod) == (128,1024) : res = 0.006222 * base_time_ms
-    if (exp, mod) == (128,512) : res = 0.002515 * base_time_ms
-    if (exp, mod) == (384,4096) : res = 0.196598 * base_time_ms
-    if (exp, mod) == (384,2048) : res = 0.053895 * base_time_ms
-    if (exp, mod) == (384,1024) : res = 0.017076 * base_time_ms
-    if (exp, mod) == (768,4096) : res = 0.377192 * base_time_ms
-    if (exp, mod) == (768,2048) : res = 0.102272 * base_time_ms
-    if (exp, mod) == (768,1024) : res = 0.030858 * base_time_ms
-    if (exp, mod) == (768,1024) : res = 0.030961 * base_time_ms
-    if (exp, mod) == (1792,1024) : res = 0.075015 * base_time_ms
-    if (exp, mod) == (1280,1024) : res = 0.055187 * base_time_ms
-    if (exp, mod) == (1536,4096) : res = 0.761429 * base_time_ms
+    if (exp, mod) == (2048,1024) : res = 0.081596 * base_time_ms
+    if (exp, mod) == (1024,2048) : res = 0.141994 * base_time_ms
+    if (exp, mod) == (1024,4096) : res = 0.510803 * base_time_ms
+    if (exp, mod) == (1024,1024) : res = 0.042022 * base_time_ms
+    if (exp, mod) == (4096,4096) : res = 1.973207 * base_time_ms
+    if (exp, mod) == (512,4096) : res = 0.265187 * base_time_ms
+    if (exp, mod) == (512,2048) : res = 0.074424 * base_time_ms
+    if (exp, mod) == (512,1024) : res = 0.021511 * base_time_ms
+    if (exp, mod) == (256,4096) : res = 0.140861 * base_time_ms
+    if (exp, mod) == (256,2048) : res = 0.037966 * base_time_ms
+    if (exp, mod) == (256,1024) : res = 0.011588 * base_time_ms
+    if (exp, mod) == (128,4096) : res = 0.074498 * base_time_ms
+    if (exp, mod) == (128,2048) : res = 0.021300 * base_time_ms
+    if (exp, mod) == (128,1024) : res = 0.006852 * base_time_ms
+    if (exp, mod) == (128,512) : res = 0.007956 * base_time_ms
+    if (exp, mod) == (384,4096) : res = 0.202235 * base_time_ms
+    if (exp, mod) == (384,2048) : res = 0.057764 * base_time_ms
+    if (exp, mod) == (384,1024) : res = 0.016174 * base_time_ms
+    if (exp, mod) == (384,512) : res = 0.024014 * base_time_ms
+    if (exp, mod) == (896,512) : res = 0.052850 * base_time_ms
+    if (exp, mod) == (384,512) : res = 0.023436 * base_time_ms
+    if (exp, mod) == (768,4096) : res = 0.394831 * base_time_ms
+    if (exp, mod) == (768,2048) : res = 0.108155 * base_time_ms
+    if (exp, mod) == (768,1024) : res = 0.040745 * base_time_ms
+    if (exp, mod) == (768,1024) : res = 0.032987 * base_time_ms
+    if (exp, mod) == (1792,1024) : res = 0.070891 * base_time_ms
+    if (exp, mod) == (1280,1024) : res = 0.052689 * base_time_ms
+    if (exp, mod) == (1536,4096) : res = 0.811380 * base_time_ms
 
     if res == 0: print(f'error {exp}, {mod}, {C}, {P}, {V}')
     
@@ -100,20 +103,11 @@ def set_values(n):
     presign = 2*paillier[0] + 7*G() + ddh[0] + (n-1)*(Rddh[0] + Rddh[1] + 4*paillier[0] + 2*E(Q,N2) + 2*affg[0] + 2*affg[1] + log[0] + log[1] + 2*paillier[1] + ddh[1])
     return presign
 
-pool = 0
-ver = 0
-crt = 0
+import itertools as it
 
-print(set_values(3))
-
-pool = 1
-ver = 1
-crt = 1
-
-print(set_values(3))
-
-crt = 0
-pool = 0
-
-print(set_values(3))
+for pool in range(2):
+    for ver in range(2):
+        for crt in range(2):
+            show_params()
+            print(set_values(3))
 
