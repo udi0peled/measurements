@@ -29,7 +29,7 @@ void print_to_file(uint64_t exp_bits, uint64_t mod_bits, double time_ms)
     fprintf(out_file, "base_time_ms == %f\n", base_time);
   }
 
-  fprintf(out_file, "if (exp, mod) == (%ld,%ld) : return %f * base_time_ms\n", exp_bits, mod_bits, time_ms/base_time);
+  fprintf(out_file, "if (exp, mod) == (%ld,%ld) : res = %f * base_time_ms\n", exp_bits, mod_bits, time_ms/base_time);
 }
 
 void set_file_letter(char l)
@@ -390,7 +390,7 @@ int main()
 
   BN_CTX* bn_ctx = BN_CTX_new();
 
-  uint64_t safe_prime_bits = 256;
+  uint64_t safe_prime_bits = 1024;
 
   scalar_t P = BN_new();
   scalar_t Q = BN_new();
@@ -420,14 +420,14 @@ int main()
 
   scalar_t exp = BN_new();
 
+  BN_rand(exp, 2*safe_prime_bits, 1, 0);  
+  time_mod_exp(1000, N2, exp);
+  time_mod_exp(1000, P,  exp);
+  time_mod_exp(1000, N, P);
+
   BN_rand(exp, safe_prime_bits, 1, 0);
   time_mod_exp(1000, N2, exp);
   time_mod_exp(1000, P, exp);
-  
-  BN_rand(exp, 2*safe_prime_bits, 1, 0);  
-  time_mod_exp(1000, P,  exp);
-  time_mod_exp(1000, N, P);
-  time_mod_exp(1000, N2, exp);
   
   BN_rand(exp, 4*safe_prime_bits, 1, 0);
   time_mod_exp(1000, N2, exp);
@@ -437,14 +437,46 @@ int main()
   time_mod_exp(1000, N, exp);
   time_mod_exp(1000, P, exp);
 
+  BN_rand(exp, safe_prime_bits/4, 1, 0);
+  time_mod_exp(1000, N2, exp);
+  time_mod_exp(1000, N, exp);
+  time_mod_exp(1000, P, exp);
+
+  BN_rand(exp, safe_prime_bits/8, 1, 0);
+  BN_rand(Q, 512, 1, 0);
+  time_mod_exp(1000, N2, exp);
+  time_mod_exp(1000, N, exp);
+  time_mod_exp(1000, P, exp);
+  time_mod_exp(1000, Q, exp);
+
+  BN_rand(exp, 3*safe_prime_bits/8, 1, 0);
+  time_mod_exp(1000, N2, exp);
+  time_mod_exp(1000, N, exp);
+  time_mod_exp(1000, P, exp);
+
+  BN_rand(exp, 3*safe_prime_bits/4, 1, 0);
+  time_mod_exp(1000, N2, exp);
+  time_mod_exp(1000, N, exp);
+  time_mod_exp(1000, P, exp);
+
+  BN_rand(exp, 768, 1, 0);
+  time_mod_exp(1000, P, exp);
+  
+  BN_rand(exp, 1792, 1, 0);
+  time_mod_exp(1000, P, exp);
+
+  BN_rand(exp, 1280, 1, 0);
+  time_mod_exp(1000, P, exp);
+
   BN_rand(exp, 3*safe_prime_bits/2, 1, 0);
   time_mod_exp(1000, N2, exp);
 
+  return 0;
   set_file_letter('F');
 
   scalar_t base = BN_new();
   uint64_t max_prime_bits = 2048;
-  
+
 
   for (uint64_t prime_bits = 32; prime_bits <= max_prime_bits; prime_bits *= 2) 
   {
@@ -480,6 +512,7 @@ int main()
   BN_free(Q);
   BN_free(N);
   BN_free(N2);
+
 
   BN_CTX_free(bn_ctx);
 }

@@ -1,63 +1,28 @@
 E
-base_time_ms == 0.074210
-if (exp, mod) == (256,1024) : return 1.000000 * base_time_ms
-if (exp, mod) == (256,256) : return 0.261919 * base_time_ms
-if (exp, mod) == (512,256) : return 0.517639 * base_time_ms
-if (exp, mod) == (256,512) : return 0.479693 * base_time_ms
-if (exp, mod) == (512,1024) : return 1.927759 * base_time_ms
-if (exp, mod) == (1024,1024) : return 3.585069 * base_time_ms
-if (exp, mod) == (128,1024) : return 0.571742 * base_time_ms
-if (exp, mod) == (128,512) : return 0.252823 * base_time_ms
-if (exp, mod) == (128,256) : return 0.155316 * base_time_ms
-if (exp, mod) == (384,1024) : return 1.488492 * base_time_ms
-F
-base_time_ms == 0.002923
-if (exp, mod) == (2,32) : return 1.000000 * base_time_ms
-if (exp, mod) == (4,32) : return 1.407800 * base_time_ms
-if (exp, mod) == (8,32) : return 1.862470 * base_time_ms
-if (exp, mod) == (16,32) : return 1.638385 * base_time_ms
-if (exp, mod) == (2,64) : return 1.424564 * base_time_ms
-if (exp, mod) == (4,64) : return 2.182005 * base_time_ms
-if (exp, mod) == (8,64) : return 2.830653 * base_time_ms
-if (exp, mod) == (16,64) : return 2.812521 * base_time_ms
-if (exp, mod) == (32,64) : return 4.133082 * base_time_ms
-if (exp, mod) == (2,128) : return 1.628122 * base_time_ms
-if (exp, mod) == (4,128) : return 1.324666 * base_time_ms
-if (exp, mod) == (8,128) : return 1.676018 * base_time_ms
-if (exp, mod) == (16,128) : return 1.605884 * base_time_ms
-if (exp, mod) == (32,128) : return 2.923709 * base_time_ms
-if (exp, mod) == (64,128) : return 2.281218 * base_time_ms
-if (exp, mod) == (2,256) : return 1.503592 * base_time_ms
-if (exp, mod) == (4,256) : return 1.575778 * base_time_ms
-if (exp, mod) == (8,256) : return 1.735888 * base_time_ms
-if (exp, mod) == (16,256) : return 2.653438 * base_time_ms
-if (exp, mod) == (32,256) : return 2.880944 * base_time_ms
-if (exp, mod) == (64,256) : return 4.061581 * base_time_ms
-if (exp, mod) == (128,256) : return 5.384536 * base_time_ms
-if (exp, mod) == (2,512) : return 2.796100 * base_time_ms
-if (exp, mod) == (4,512) : return 2.050975 * base_time_ms
-if (exp, mod) == (8,512) : return 2.850496 * base_time_ms
-if (exp, mod) == (16,512) : return 2.848785 * base_time_ms
-if (exp, mod) == (32,512) : return 2.865549 * base_time_ms
-if (exp, mod) == (64,512) : return 4.401300 * base_time_ms
-if (exp, mod) == (128,512) : return 6.265481 * base_time_ms
-if (exp, mod) == (256,512) : return 10.893260 * base_time_ms
-if (exp, mod) == (2,1024) : return 2.052686 * base_time_ms
-if (exp, mod) == (4,1024) : return 2.234690 * base_time_ms
-if (exp, mod) == (8,1024) : return 3.086897 * base_time_ms
-if (exp, mod) == (16,1024) : return 4.372562 * base_time_ms
-if (exp, mod) == (32,1024) : return 5.652754 * base_time_ms
-if (exp, mod) == (64,1024) : return 9.056449 * base_time_ms
-if (exp, mod) == (128,1024) : return 14.902497 * base_time_ms
-if (exp, mod) == (256,1024) : return 27.881628 * base_time_ms
-if (exp, mod) == (512,1024) : return 49.046528 * base_time_ms
-if (exp, mod) == (2,2048) : return 4.022922 * base_time_ms
-if (exp, mod) == (4,2048) : return 5.187479 * base_time_ms
-if (exp, mod) == (8,2048) : return 6.267191 * base_time_ms
-if (exp, mod) == (16,2048) : return 9.436538 * base_time_ms
-if (exp, mod) == (32,2048) : return 15.861102 * base_time_ms
-if (exp, mod) == (64,2048) : return 24.861102 * base_time_ms
-if (exp, mod) == (128,2048) : return 44.852891 * base_time_ms
-if (exp, mod) == (256,2048) : return 81.694492 * base_time_ms
-if (exp, mod) == (512,2048) : return 158.791995 * base_time_ms
-if (exp, mod) == (1024,2048) : return 309.747862 * base_time_ms
+base_time_ms == 5.685242
+if (exp, mod) == (2048,4096) : res = 1.000000 * base_time_ms
+if (exp, mod) == (2048,1024) : res = 0.077083 * base_time_ms
+if (exp, mod) == (1024,2048) : res = 0.136546 * base_time_ms
+if (exp, mod) == (1024,4096) : res = 0.514042 * base_time_ms
+if (exp, mod) == (1024,1024) : res = 0.039685 * base_time_ms
+if (exp, mod) == (4096,4096) : res = 1.980670 * base_time_ms
+if (exp, mod) == (512,4096) : res = 0.255801 * base_time_ms
+if (exp, mod) == (512,2048) : res = 0.076914 * base_time_ms
+if (exp, mod) == (512,1024) : res = 0.021245 * base_time_ms
+if (exp, mod) == (256,4096) : res = 0.140735 * base_time_ms
+if (exp, mod) == (256,2048) : res = 0.037493 * base_time_ms
+if (exp, mod) == (256,1024) : res = 0.011757 * base_time_ms
+if (exp, mod) == (128,4096) : res = 0.069756 * base_time_ms
+if (exp, mod) == (128,2048) : res = 0.019113 * base_time_ms
+if (exp, mod) == (128,1024) : res = 0.006222 * base_time_ms
+if (exp, mod) == (128,512) : res = 0.002515 * base_time_ms
+if (exp, mod) == (384,4096) : res = 0.196598 * base_time_ms
+if (exp, mod) == (384,2048) : res = 0.053895 * base_time_ms
+if (exp, mod) == (384,1024) : res = 0.017076 * base_time_ms
+if (exp, mod) == (768,4096) : res = 0.377192 * base_time_ms
+if (exp, mod) == (768,2048) : res = 0.102272 * base_time_ms
+if (exp, mod) == (768,1024) : res = 0.030858 * base_time_ms
+if (exp, mod) == (768,1024) : res = 0.030961 * base_time_ms
+if (exp, mod) == (1792,1024) : res = 0.075015 * base_time_ms
+if (exp, mod) == (1280,1024) : res = 0.055187 * base_time_ms
+if (exp, mod) == (1536,4096) : res = 0.761429 * base_time_ms
