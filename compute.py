@@ -18,6 +18,8 @@ def E(calc_dict, calc_amount, calc_type, exp, mod, C=0, P=0, V=0):
     if C:
         exp //= 2
         mod //= 2
+        E(calc_dict, 2*calc_amount, calc_type, exp, mod, C=0, P=P, V=V)
+        return
     
     res = 0
 
@@ -54,8 +56,6 @@ def E(calc_dict, calc_amount, calc_type, exp, mod, C=0, P=0, V=0):
         if (exp, mod) == (1536,4096) : res = 0.811380 * base_time_ms
 
         if res == 0: print(f'error {exp}, {mod}, {C}, {P}, {V}')
-    
-    if C: res *= 2
 
     curr_amount, time = calc_dict[calc_type].get((exp,mod, C, P, V), (0, 0))    
     calc_dict[calc_type][(exp,mod, C, P, V)] = (curr_amount + calc_amount, time + calc_amount*res)
