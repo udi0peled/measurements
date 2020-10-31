@@ -85,7 +85,7 @@ def paillier(b, d, a):
     if b == 0:
         E(d, a, "paillier", N,N2,P=pool)
     else:
-        E(d, a, "paillier", N,N2)
+        E(d, a, "paillier", N,N2, C=crt)
     
 def sch(b, d, a):
     if b == 0:
