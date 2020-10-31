@@ -116,6 +116,40 @@ void time_mod_mult(uint64_t reps, scalar_t modulus)
   BN_CTX_free(bn_ctx);
 }
 
+void printBIGNUM(const char * prefix, const BIGNUM *bn, const char * suffix) {
+  char *bn_str = BN_bn2dec(bn);
+  printf("%s%s%s", prefix, bn_str, suffix);
+  free(bn_str);
+}
+
+void time_binary_field(uint64_t reps, int mod_poly[])
+{
+    BN_CTX *bn_ctx = BN_CTX_new();
+
+    BIGNUM *f = BN_new();
+    BIGNUM *a = BN_new();
+    BIGNUM *b = BN_new();
+
+    BN_GF2m_arr2poly(mod_poly, f);
+    sample_in_range(f, a, 1);
+    sample_in_range(f, b, 1);
+
+    // printBIGNUM("f: ", f, "\n");
+    // printBIGNUM("a: ", a, "\n");
+    // printBIGNUM("b: ", b, "\n");
+  
+    start = clock();
+
+    for (uint64_t i = 0; i < reps; ++i) {
+        BN_GF2m_mod_mul(a, a, a, f, bn_ctx);
+        //printBIGNUM("a: ", a, "\n");
+    }
+
+    diff = clock() - start;
+    single_ms = ((double) diff * 1000/ CLOCKS_PER_SEC)/reps;
+
+    printf("computing binary mod mult (%d-bit modulus)\n%lu repetitions, time: %lu msec, avg: %f msec\n", BN_num_bits(f), reps, diff * 1000/ CLOCKS_PER_SEC, single_ms); 
+}
 
 void time_mod_mult_mont(uint64_t reps, scalar_t modulus)
 { 
@@ -381,6 +415,15 @@ void time_ec_exp(uint64_t reps, scalar_t exp)
 
 int main()
 {
+  BIGNUM* PRIME = BN_new();
+  int mod_poly[] = {8191, 714, 0, -1};
+
+  BN_generate_prime_ex(PRIME, 4096, 0, NULL, NULL, NULL);
+  time_mod_mult(10000, PRIME);
+  time_binary_field(100000, mod_poly);
+
+  return 0;
+
   out_file = fopen("./timing.txt","w");
 
   if(out_file == NULL)
@@ -412,10 +455,10 @@ int main()
 
   time_ec_exp(1000, N);
 
-  // time_mod_mult(1000, P);
-  // time_mod_mult(1000, N);
-  // time_mod_mult(1000, N2);
-  
+  time_mod_mult(1000, P);
+  time_mod_mult(1000, N);
+  time_mod_mult(1000, N2);
+
   set_file_letter('E');
 
   scalar_t exp = BN_new();
@@ -479,18 +522,16 @@ int main()
   BN_rand(exp, 3*safe_prime_bits/2, 1, 0);
   time_mod_exp(1000, N2, exp);
 
-  return 0;
   set_file_letter('F');
 
   scalar_t base = BN_new();
   uint64_t max_prime_bits = 2048;
 
-
   for (uint64_t prime_bits = 32; prime_bits <= max_prime_bits; prime_bits *= 2) 
   {
     BN_generate_prime_ex(P, prime_bits, 0, NULL, NULL, NULL);
-    for (uint64_t i = 2; i <= prime_bits-3; i *= 2) {
-      BN_rand(exp, i, 1, 0);
+    for (uint64_t d = 2; d <= 30; d += 4) {
+      BN_rand(exp, d, 1, 0);
       time_mod_exp(1000, P, exp);
     }
   }
