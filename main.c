@@ -203,6 +203,33 @@ void time_mod_exp(uint64_t reps, scalar_t modulus, scalar_t exp)
   BN_CTX_free(bn_ctx);
 }
 
+
+void time_mod_square(uint64_t reps, scalar_t modulus)
+{ 
+  BN_CTX* bn_ctx = BN_CTX_new();
+  scalar_t base = BN_new();
+
+  sample_in_range(modulus, base, 0);
+  
+  start = clock();
+
+  for (uint64_t i = 0; i < reps; ++i)
+  {
+    BN_mod_sqr(base, base, modulus, bn_ctx);
+    BN_add_word(base, 1);
+  }
+
+  diff = clock() - start;
+  single_ms = ((double) diff * 1000/ CLOCKS_PER_SEC) / reps;
+  //print_to_file(BN_num_bits(exp), BN_num_bits(modulus), single_ms);
+  printf("computing squares mod [%d-bits]\n%lu repetitions, time: %lu msec, avg: %f msec\n", BN_num_bits(modulus), reps, diff * 1000/ CLOCKS_PER_SEC, single_ms);
+
+
+  BN_free(base);
+  BN_CTX_free(bn_ctx);
+}
+
+
 void time_mod_exp_mont(uint64_t reps, scalar_t modulus, scalar_t exp)
 { 
   BN_CTX* bn_ctx = BN_CTX_new();
@@ -422,8 +449,6 @@ int main()
   time_mod_mult(10000, PRIME);
   time_binary_field(100000, mod_poly);
 
-  return 0;
-
   out_file = fopen("./timing.txt","w");
 
   if(out_file == NULL)
@@ -455,15 +480,18 @@ int main()
 
   time_ec_exp(1000, N);
 
-  time_mod_mult(1000, P);
-  time_mod_mult(1000, N);
-  time_mod_mult(1000, N2);
+  time_mod_mult(100000, P);
+  time_mod_mult(100000, N);
+  time_mod_mult(100000, N2);
+
+  time_mod_square(100000, N2);
 
   set_file_letter('E');
 
   scalar_t exp = BN_new();
   BN_rand(Q, 512, 1, 0);
 
+  BN_set_flags(exp, BN_FLG_CONSTTIME);
   BN_rand(exp, 2*safe_prime_bits, 1, 0);  
   time_mod_exp(1000, N2, exp);
   time_mod_exp(1000, P,  exp);

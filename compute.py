@@ -25,7 +25,7 @@ def E(calc_dict, calc_amount, calc_type, exp, mod, C=0, P=0, V=0):
     
     res = 0
 
-    if P == 0:
+    if P >= 0:
         base_time_ms = 7.929542
         if (exp, mod) == (2048,4096) : res = 1.000000 * base_time_ms
         if (exp, mod) == (2048,1024) : res = 0.081596 * base_time_ms
@@ -65,13 +65,16 @@ def E(calc_dict, calc_amount, calc_type, exp, mod, C=0, P=0, V=0):
 
     if V == 1:
         res /= VER_BATCH_FACTOR
+        
+    if P == 1 and (exp == 2048 and mod == 4096) or (exp == 1024 and mod == 2048):
+        res /= 10
 
     curr_amount, time = calc_dict[calc_type].get((exp,mod, C, P, V), (0, 0))    
     calc_dict[calc_type][(exp,mod, C, P, V)] = (curr_amount + calc_amount, time + calc_amount*res)
 
 def Ped(calc_dict, calc_amount, is_private, exp1_bits, exp2_bits, exp1_rand=0, exp2_rand=0):
-    pool1 = int((exp1_rand>0) and (pool>0))
-    pool2 = int((exp2_rand>0) and (pool>0))
+    pool1 = False #int((exp1_rand>0) and (pool>0))
+    pool2 = False #int((exp2_rand>0) and (pool>0))
     
     to_crt = int((is_private>0) and (crt>0))
     to_ver = int((is_private>0) and (ver>0))
