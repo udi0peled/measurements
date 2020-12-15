@@ -20,7 +20,7 @@ def E(calc_dict, calc_amount, calc_type, exp, mod, C=0, P=0, V=0):
     if C:
         exp //= 2
         mod //= 2
-        E(calc_dict, 2*calc_amount, calc_type, exp, mod, C=0, P=P, V=V)
+        res = E(calc_dict, 2*calc_amount, calc_type, exp, mod, C=0, P=P, V=V)
         return
     
     res = 0

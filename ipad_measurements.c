@@ -163,7 +163,8 @@ void time_mod_mult(uint64_t reps, scalar_t modulus)
 
   diff = clock() - start;
   single_ms = ((double) diff * 1000/ CLOCKS_PER_SEC) / reps;
-  my_printf("computing mod mult (%d-bit modulus)\n%lu repetitions, time: %lu msec, avg: %f msec\n", BN_num_bits(modulus), reps, diff * 1000/ CLOCKS_PER_SEC, single_ms);
+  //my_printf("computing mod mult (%d-bit modulus)\n%lu repetitions, time: %lu msec, avg: %f msec\n", BN_num_bits(modulus), reps, diff * 1000/ CLOCKS_PER_SEC, single_ms);
+  printf("mul[%d] = %ld\n", BN_num_bits(modulus), diff * 1000/ CLOCKS_PER_SEC);
 
   BN_CTX_end(bn_ctx);
   BN_CTX_free(bn_ctx);
@@ -262,6 +263,8 @@ void time_ec_exp(uint64_t reps, scalar_t exp)
 //Returns length of string of measurements results
 char *ipad_measurements() {
     BN_CTX *bn_ctx = BN_CTX_secure_new();
+    BN_CTX_start(bn_ctx);
+
     res_str = malloc(0);
 
     int poly8192[] = {8192, 9 , 5 , 2 , 0, -1};
@@ -273,37 +276,42 @@ char *ipad_measurements() {
     time_binary_field_mul(100000, poly32);
     time_binary_field_inv_add(1000, poly32);
 
-    scalar_t P   = BN_new();
-    scalar_t Q   = BN_new();
-    scalar_t N   = BN_new();
-    scalar_t N2  = BN_new();
-    scalar_t exp = BN_new();
-    
+    scalar_t P   = BN_CTX_get(bn_ctx);
+    scalar_t Q   = BN_CTX_get(bn_ctx);
+    scalar_t N   = BN_CTX_get(bn_ctx);
+    scalar_t N2  = BN_CTX_get(bn_ctx);
+    scalar_t exp = BN_CTX_get(bn_ctx);
+    scalar_t mod = BN_CTX_get(bn_ctx);  
+
     BN_rand(exp, 256, 1, 0);
     time_ec_exp(1000, exp);
     
     uint64_t safe_prime_bits = 1024;
 
-    BN_generate_prime_ex(P, safe_prime_bits, 1, NULL, NULL, NULL);
-    BN_generate_prime_ex(Q, safe_prime_bits, 1, NULL, NULL, NULL);
-    BN_mul(N, P, Q, bn_ctx);
-    BN_mul(N2, N, N, bn_ctx);
+    // BN_generate_prime_ex(P, safe_prime_bits, 1, NULL, NULL, NULL);
+    // BN_generate_prime_ex(Q, safe_prime_bits, 1, NULL, NULL, NULL);
+    // BN_mul(N, P, Q, bn_ctx);
+    // BN_mul(N2, N, N, bn_ctx);
 
-    diff = clock() - start;
-    single_ms = (double) diff * 1000/ CLOCKS_PER_SEC;
+    // diff = clock() - start;
+    // single_ms = (double) diff * 1000/ CLOCKS_PER_SEC;
 
-    my_printf("generating two safe primes P,Q (%ld-bits): %f msec\n", safe_prime_bits, single_ms);
-    printBIGNUM("P: ", P, "\n");
-    printBIGNUM("Q: ", Q, "\n");
-    printBIGNUM("N: ", N, "\n");
-    printBIGNUM("N2: ", N2, "\n");
+    // my_printf("generating two safe primes P,Q (%ld-bits): %f msec\n", safe_prime_bits, single_ms);
+    // printBIGNUM("P: ", P, "\n");
+    // printBIGNUM("Q: ", Q, "\n");
+    // printBIGNUM("N: ", N, "\n");
+    // printBIGNUM("N2: ", N2, "\n");
 
     #define MULT_NUM 100000
     
-    time_mod_mult(MULT_NUM, P);
-    time_mod_mult(MULT_NUM, N);
-    time_mod_mult(MULT_NUM, N2);
+    // time_mod_mult(MULT_NUM, P);
+    // time_mod_mult(MULT_NUM, N);
+    // time_mod_mult(MULT_NUM, N2);
 
+    for (int i = 64; i < 6000; i += 100) {
+      BN_rand(mod, i, 1, 1);
+      time_mod_mult(MULT_NUM, mod);
+    }
     #define EXP_NUM 1000
 
     time_mod_exp(EXP_NUM, N2, N);
@@ -326,10 +334,7 @@ char *ipad_measurements() {
     BN_rand(exp, 7*safe_prime_bits/4, 1, 0);
     time_mod_exp(EXP_NUM, P, exp);
 
-    BN_free(P);
-    BN_free(Q);
-    BN_free(N);
-    BN_free(N2);
+    BN_CTX_end(bn_ctx);
     BN_CTX_free(bn_ctx);
     return res_str;
 }
