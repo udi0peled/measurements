@@ -254,7 +254,7 @@ int PM_mod_mul_montgomery(BIGNUM *r, BIGNUM *rq, const BIGNUM *a, const BIGNUM *
     int ret = pm_mul_mont_fixed_top(r, rq, a, aq, b, bq, mont, ctx);
 
     udi_correct_top(r);
-    BN_mod(rq, rq, N, ctx)
+    udi_correct_top(rq);
     udi_check_top(r);
     udi_check_top(rq);
 
@@ -286,18 +286,23 @@ int pm_mul_mont_fixed_top(BIGNUM *r, BIGNUM *rq, const BIGNUM *a, const BIGNUM *
         if (!BN_mul(tmp, a, b, ctx))
             goto err;
     }
+
+    printBIGNUM("T = ", tmp, "\n");
+    
     /* reduce from aRR to aR */
-    if (!UDI_from_montgomery(r, tmp, mont, ctx))
+    if (!PM_from_montgomery(r, rq, tmp, mont, ctx))
         goto err;
-    if (!BN_rshift(rq, tmp, mont->ri))
-      goto err;
+    printBIGNUM("r = ", r, "\n");
+    printBIGNUM("rq = ", rq, "\n");
 
     if ((a == b) && (aq == bq))
     {
-      if (!udi_mul_mont_fixed_top(tmp, a, bq, mont, ctx))
+      if (!udi_mul_mont_fixed_top(tmp, a, aq, mont, ctx))
           goto err;
+      printBIGNUM("tmp = ", tmp, "\n");
       if (!BN_mul_word(tmp, 2))
           goto err;
+      
       if (!BN_add(rq, rq, tmp)) 
           goto err;
 
@@ -319,8 +324,71 @@ int pm_mul_mont_fixed_top(BIGNUM *r, BIGNUM *rq, const BIGNUM *a, const BIGNUM *
     return ret;
 }
 
+int PM_from_montgomery(BIGNUM *ret, BIGNUM *retq, const BIGNUM *a, BN_MONT_CTX *mont, BN_CTX *ctx)
+{
+    int retn;
+
+    retn = pm_from_mont_fixed_top(ret, retq, a, mont, ctx);
+    udi_correct_top(ret);
+    udi_correct_top(retq);
+    udi_check_top(ret);
+    udi_check_top(retq);
+
+    return retn;
+}
+
+int pm_from_mont_fixed_top(BIGNUM *ret, BIGNUM *retq, const BIGNUM *a, BN_MONT_CTX *mont, BN_CTX *ctx)
+{
+    int retn = 0;
+    
+    BIGNUM *t1, *t2, *t2q;
+
+    BN_CTX_start(ctx);
+    t1 = BN_CTX_get(ctx);
+    t2 = BN_CTX_get(ctx);
+    if (t2 == NULL)
+        goto err;
+
+    if (!BN_copy(retq, a))
+      goto err;
+    BN_mask_bits(retq, mont->ri);
+    if (!BN_mul(retq, retq, &mont->Ni, ctx))
+      goto err;
+    if (!BN_rshift(retq, retq, mont->ri))
+      goto err;
+    BN_mask_bits(retq, mont->ri);
+
+    if (!BN_copy(t1, a))
+        goto err;
+    BN_mask_bits(t1, mont->ri);
+
+    if (!BN_mul(t2, t1, &mont->Ni, ctx))
+        goto err;
+    BN_mask_bits(t2, mont->ri);
+    
+    if (!BN_mul(t1, t2, &mont->N, ctx))
+        goto err;
+    if (!BN_add(t2, a, t1))
+        goto err;
+    if (!BN_rshift(ret, t2, mont->ri))
+        goto err;
+
+    if (BN_ucmp(ret, &(mont->N)) >= 0) {
+        if (!BN_usub(ret, ret, &(mont->N)))
+            goto err;
+        if (!BN_add_word(retq, 1))
+            goto err;
+    }
+    retn = 1;
+    udi_check_top(ret);
+    udi_check_top(retq);
+ err:
+    BN_CTX_end(ctx);
+
+    return retn;
+}
+
 /***
- * 
  * 
  *  Testing and timing 
  * 
@@ -501,28 +569,52 @@ int main() {
   BIGNUM *c   = BN_CTX_get(bn_ctx);
   BIGNUM *cq  = BN_CTX_get(bn_ctx);
 
-  BN_set_word(N, 7);
+  srand(time(NULL));
+  unsigned long long_N = 5;
+  unsigned long long_A = rand() % long_N;
+  unsigned long long_Aq = rand() % long_N;
+  unsigned long long_B = rand() % long_N;
+  unsigned long long_Bq = rand() % long_N;
+  unsigned long long_C = 0;
+  unsigned long long_Cq = 0;
 
-  BN_set_word(a, 5);
-  BN_set_word(aq, 2);
-  BN_set_word(b, 3);
-  BN_set_word(bq, 1);
+  BN_set_word(N, long_N);
+  BN_set_word(a, long_A);
+  BN_set_word(aq, long_Aq);
+  BN_set_word(b, long_B);
+  BN_set_word(bq, long_Bq);
+
+  printBIGNUM("N  = ", N, "\n");
+  printBIGNUM("a  = ", a, "\n");
+  printBIGNUM("aq = ", aq, "\n");
+  printBIGNUM("b  = ", b, "\n");
+  printBIGNUM("bq = ", bq, "\n");
 
   BN_MONT_CTX *mnt_ctx = BN_MONT_CTX_new();
   UDI_MONT_CTX_set(mnt_ctx, N, bn_ctx);
+  printf("mnt->ri = %d\n", mnt_ctx->ri);
+  printBIGNUM("mnt->Ni = ", &mnt_ctx->Ni, "\n");
   
   UDI_to_montgomery(a, a, mnt_ctx, bn_ctx);
   UDI_to_montgomery(aq, aq, mnt_ctx, bn_ctx);
   UDI_to_montgomery(b, b, mnt_ctx, bn_ctx);
   UDI_to_montgomery(bq, bq, mnt_ctx, bn_ctx);
+  printBIGNUM("a  = ", a, "\n");
+  printBIGNUM("aq = ", aq, "\n");
+  printBIGNUM("b  = ", b, "\n");
+  printBIGNUM("bq = ", bq, "\n");
 
-  PM_mod_mul_montgomery(c, cq, a, aq, b, bq, mnt_ctx, N, bn_ctx );
+  PM_mod_mul_montgomery(c, cq, a, aq, a, aq, mnt_ctx, N, bn_ctx );
 
   UDI_from_montgomery(c, c, mnt_ctx, bn_ctx);
   UDI_from_montgomery(cq, cq, mnt_ctx, bn_ctx);
 
-  printBIGNUM("c = ", c, "\n");
-  printBIGNUM("c = ", cq, "\n");
+  printBIGNUM("c  = ", c, "\n");
+  printBIGNUM("cq = ", cq, "\n");
+
+  long_C = (long_A * long_A) % long_N;
+  long_Cq = ((unsigned long) ((long_A + long_N*long_Aq) * (long_A + long_N*long_Aq)) / long_N) % long_N;
+  printf("%d %d\n", BN_is_word(c, long_C), BN_is_word(cq, long_Cq));
 
   return 0;
   start = clock();
@@ -555,7 +647,6 @@ int main() {
 
   BN_mod_exp(N, N, N, N, bn_ctx);
   
-
   BN_CTX_end(bn_ctx);
   BN_CTX_free(bn_ctx);
 }
